@@ -7,7 +7,9 @@ editor: visual
 
 ```{r setup}
 if (!require("pacman")) install.packages("pacman"); library(pacman)
-pacman::p_load(tidyverse, ggplot2, readr, haven, readxl, here, dplyr)
+pacman::p_load(
+  tidyverse, ggplot2, readr, haven, readxl, here, dplyr, lubridate, patchwork
+  )
 
 here::i_am("analyze.qmd")
 ```
@@ -51,7 +53,9 @@ teamstats_total <- teamstats_total |>
       opp == "sef" ~ "Freising",
       TRUE ~ "Other"
     ),
-    season = as.factor(season))
+    season = as.factor(season),
+    date = lubridate::ymd(date)
+    )
 ```
 
 ```{r plot-points-per-team}
@@ -70,4 +74,38 @@ ggplot(teamstats_total, aes(x = opp, y = pts, fill = season)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   scale_y_continuous(breaks = seq(0, max_tatal_pts_all_seasons, by = 2), limits = c(0, max_tatal_pts_all_seasons))
+```
+
+```{r plot-2324}
+plot_time_2223 <- teamstats_total |> 
+  filter(season == "2324") |> 
+  ggplot(aes(x = date, y = spct)) +
+    geom_line(linewidth = 1) +
+  labs(title = "Schussquote über die Saison 2023/2024",
+       x = "Zeit",
+       y = "Schussquote") +
+  theme_minimal()
+
+plot_time_2324 <- teamstats_total |> 
+  filter(season == "2223") |> 
+  ggplot(aes(x = date, y = spct)) +
+    geom_line(linewidth = 1) +
+  labs(title = "Schussquote über die Saison 2022/2023",
+       x = "Zeit",
+       y = "Schussquote") +
+  theme_minimal() +
+  
+
+plot_time_2223 + plot_time_2324 + patchwork::plot_layout(ncol = 1)
+
+
+teamstats_total |> 
+  mutate(date = ifelse(season == "2223", date %m+% years(1), date)) |> 
+  ggplot(aes(x = date, y = spct)) +
+    geom_line(linewidth = 1) +
+  labs(title = "Schussquote über die Saison",
+       x = "Zeit",
+       y = "Schussquote") +
+  theme_minimal() + 
+  facet_grid(rows = vars(season))
 ```
