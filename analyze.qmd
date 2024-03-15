@@ -22,6 +22,8 @@ teamstats_total <- read_xlsx(
   sheet = 1
   )
 
+teamstats_total[1, "season"] <- 2425
+
 ### Erster Überblick
 
 head(teamstats_total)
@@ -65,9 +67,12 @@ teamstats_total <- teamstats_total |>
     ),
     season = gsub("(\\d{2})(\\d{2})", "\\1/\\2", season),
     season = paste("Saison ", season, sep = ""),
-    date = lubridate::ymd(date)
+    season = as.factor(season),
+    date = lubridate::ymd(date),
+    date_ym = date - years(year(date) - 2022)
     )
 
+str(teamstats_total)
 ```
 
 ```{r plot-points-per-team}
@@ -90,7 +95,7 @@ ggplot(teamstats_total, aes(x = opp, y = pts, fill = season)) +
 
 ```{r plot-2324}
 plot_time_2223 <- teamstats_total |> 
-  filter(season == "2324") |> 
+  filter(season == levels(teamstats_total$season)[1]) |> 
   ggplot(aes(x = date, y = spct)) +
     geom_line(linewidth = 1) +
   labs(title = "Schussquote über die Saison 2023/2024",
@@ -99,7 +104,7 @@ plot_time_2223 <- teamstats_total |>
   theme_minimal()
 
 plot_time_2324 <- teamstats_total |> 
-  filter(season == "2223") |> 
+  filter(season == levels(teamstats_total$season)[2]) |> 
   ggplot(aes(x = date, y = spct)) +
     geom_line(linewidth = 1) +
   labs(title = "Schussquote über die Saison 2022/2023",
@@ -112,8 +117,19 @@ plot_time_2223 + plot_time_2324 + patchwork::plot_layout(ncol = 1)
 
 
 teamstats_total |> 
-  mutate(date = ifelse(season == "2223", date %m+% years(1), date)) |> 
+  mutate(date = ifelse(
+    season == levels(teamstats_total$season)[1], 
+    date %m+% years(1), 
+    date)) |> 
   ggplot(aes(x = date, y = spct)) +
+    geom_line(linewidth = 1) +
+  labs(title = "Schussquote über die Saison",
+       x = "Zeit",
+       y = "Schussquote") +
+  theme_minimal() + 
+  facet_grid(rows = vars(season))
+
+ggplot(teamstats_total, aes(x = date_ym, y = spct)) +
     geom_line(linewidth = 1) +
   labs(title = "Schussquote über die Saison",
        x = "Zeit",
@@ -123,9 +139,7 @@ teamstats_total |>
 ```
 
 ```{r plot-wintype}
-#max_wintype_count <- 
-  
-  
+max_wintype_count <- 
   teamstats_total |> 
   group_by(wintype, season) |> 
   count() |> 
