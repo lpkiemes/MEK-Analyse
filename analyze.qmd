@@ -64,6 +64,7 @@ teamstats_total <- teamstats_total |>
       TRUE ~ "Other"
     ),
     season = gsub("(\\d{2})(\\d{2})", "\\1/\\2", season),
+    season = paste("Saison ", season, sep = ""),
     date = lubridate::ymd(date)
     )
 
