@@ -41,10 +41,16 @@ teamstats_total <- teamstats_total |>
       pts %in% 0:1 ~ 0,
       pts %in% 2:3 ~ 1,
     ),
+    wintype = factor(
+      pts,
+      levels = c(0:3),
+      labels = c("Niederlage", "Niederlage nach SO", "Sieg nach SO", "Sieg")
+    ),
     oppcat = factor(
       oppcat, 
       levels = c(1:3), 
-      labels = c("high", "mid", "low")),
+      labels = c("high", "mid", "low")
+      ),
     opp = case_when(
       opp == "eva" ~ "EV Aich",
       opp == "ega" ~ "Augsburg",
@@ -57,9 +63,10 @@ teamstats_total <- teamstats_total |>
       opp == "sef" ~ "Freising",
       TRUE ~ "Other"
     ),
-    season = as.factor(season),
+    season = gsub("(\\d{2})(\\d{2})", "\\1/\\2", season),
     date = lubridate::ymd(date)
     )
+
 ```
 
 ```{r plot-points-per-team}
@@ -112,4 +119,25 @@ teamstats_total |>
        y = "Schussquote") +
   theme_minimal() + 
   facet_grid(rows = vars(season))
+```
+
+```{r plot-wintype}
+#max_wintype_count <- 
+  
+  
+  teamstats_total |> 
+  group_by(wintype, season) |> 
+  count() |> 
+  ungroup() |> 
+  summarise(max = max(n)) |> 
+  pull()
+
+ggplot(teamstats_total, aes(x = wintype)) +
+  geom_bar() +
+  labs(title = "Siege und Niederlagen nach Saison",
+       x = "Typ",
+       y = "Anzahl") +
+  facet_grid(rows = vars(season)) +
+  scale_y_continuous(breaks = seq(0, max_wintype_count, by = 2)) +
+  theme_minimal()
 ```
