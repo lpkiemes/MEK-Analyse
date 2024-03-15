@@ -1,4 +1,11 @@
-# MEK-Analyse
-# Ab dem 15. März 2024 hat dank Lauras toller Arbeit auch Ben Zugang zu diesem File :)
-# Am 15. März 2024 hatten wir ein Problemchen damit, Branches zu kreieren. Wir sind aber zuversichtlich, das Problem lösen zu können.
-# funktioniert hier irgenfwas
+# Eishockeyanalyse für den MEK
+
+Dieses Projekt führt eine grafische Analyse von Eishockeydaten für den MEK (Muenchner Eishockey Klub) durch. Die Analyse basiert auf den Daten, die in der Datei `2023-bis-2025-Teamstatistiken-R.xlsx` enthalten sind.
+
+## Daten
+
+Die Daten für diese Analyse stammen aus der Datei `2023-bis-2025-Teamstatistiken-R.xlsx`. Sie enthalten Informationen über verschiedene Aspekte der Leistung des MEK in verschiedenen Eishockeyspielen.
+
+## Verwendung
+
+Um diese Analysen durchzuführen, führen Sie das entsprechende R-Skript `analyze.qmd` aus und stellen Sie sicher, dass die Datei `2023-bis-2025-Teamstatistiken-R.xlsx` im Arbeitsverzeichnis vorhanden ist.
