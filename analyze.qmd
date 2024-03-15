@@ -1,0 +1,73 @@
+---
+title: "MEK-Analyse"
+author: "Laura Kiemes & Benjamin Dornow"
+format: html
+editor: visual
+---
+
+```{r setup}
+if (!require("pacman")) install.packages("pacman"); library(pacman)
+pacman::p_load(tidyverse, ggplot2, readr, haven, readxl, here)
+
+here::i_am("analyze.qmd")
+```
+
+```{r data}
+### Teamstats importieren
+
+teamstats_total <- read_xlsx(
+  here::here("2023-bis-2025-Teamstatistiken-R.xlsx"), 
+  sheet = 1
+  )
+
+### Erster Überblick
+
+head(teamstats_total)
+```
+
+```{r data-wrangling}
+### Gegner in Kategorien aufteilen
+
+teamstats_total <- teamstats_total |> 
+  mutate(
+    oppcat = case_when(
+      opptabelle %in% 1:2 ~ 1,
+      opptabelle %in% 3:6 ~ 2,
+      opptabelle %in% 7:10 ~ 3
+      ),
+    oppcat = factor(
+      oppcat, 
+      levels = c(1:3), 
+      labels = c("high", "mid", "low")),
+    opp = case_when(
+      opp == "eva" ~ "EV Aich",
+      opp == "ega" ~ "Augsburg",
+      opp == "dor1b" ~ "Dorfen 1B",
+      opp == "esvd" ~ "Dachau",
+      opp == "esvg" ~ "Gebensbach",
+      opp == "evk" ~ "Königsbrunn",
+      opp == "ffb1b" ~ "FFB 1B",
+      opp == "paf1b" ~ "Pfaffenhofen 1B",
+      opp == "sef" ~ "Freising",
+      TRUE ~ "Other"
+    ),
+    season = as.factor(season))
+```
+
+```{r plot-points-per-team}
+max_tatal_pts_all_seasons <- teamstats_total |> 
+  group_by(opp) |> 
+  summarize(total_pts_all_seasons = sum(pts)) |> 
+  summarise(max_total_pts_all_seasons = max(total_pts_all_seasons)) |> 
+  pull()
+
+ggplot(teamstats_total, aes(x = opp, y = pts, fill = season)) +
+  geom_bar(stat = "identity", position = "stack") +
+  labs(title = "Erzielte Punkte pro Team",
+       x = "Gegner",
+       y = "Punkte",
+       fill = "Saison") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_y_continuous(breaks = seq(0, max_tatal_pts_all_seasons, by = 2), limits = c(0, max_tatal_pts_all_seasons))
+```
