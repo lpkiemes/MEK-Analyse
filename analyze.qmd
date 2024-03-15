@@ -1,18 +1,31 @@
 ---
-title: "MEK-Analyse"
+title: "MEK-Analyse" 
 author: "Laura Kiemes & Benjamin Dornow"
 format: html
 editor: visual
+toc: true
+toc-depth: 2
 ---
+
+[![](https://www.die-luchse.de/wp-content/uploads/2024/02/Logo-MEK-Wappen.png){fig-alt="MEK Wappen" width="50"}](https://www.die-luchse.de/)
+
+# Setup
 
 ```{r setup}
 if (!require("pacman")) install.packages("pacman"); library(pacman)
 pacman::p_load(
-  tidyverse, ggplot2, readr, haven, readxl, here, dplyr, lubridate, patchwork
+  tidyverse, ggplot2, readr, haven, readxl, here, dplyr, lubridate, patchwork, ggthemes
   )
 
 here::i_am("analyze.qmd")
+
+darkyellow <- "#FAD514"
+darkgrey <- "#1D1D1B"
+
+theme_set(theme_minimal())
 ```
+
+# Data
 
 ```{r data}
 ### Teamstats importieren
@@ -22,12 +35,19 @@ teamstats_total <- read_xlsx(
   sheet = 1
   )
 
-teamstats_total[1, "season"] <- 2425
+# Test for two 24/25 games
+# teamstats_total[1, "season"] <- 2425
+# teamstats_total[1, "date"] <- 20241030
+# teamstats_total[2, "season"] <- 2425
+# teamstats_total[2, "date"] <- 20250105
 
 ### Erster Überblick
 
 head(teamstats_total)
+str(teamstats_total)
 ```
+
+# Data Wrangling
 
 ```{r data-wrangling}
 ### Gegner in Kategorien aufteilen
@@ -65,15 +85,40 @@ teamstats_total <- teamstats_total |>
       opp == "sef" ~ "Freising",
       TRUE ~ "Other"
     ),
+    heim = as.factor(heim),
     season = gsub("(\\d{2})(\\d{2})", "\\1/\\2", season),
-    season = paste("Saison ", season, sep = ""),
+    season = paste("Saison 20", season, sep = ""),
     season = as.factor(season),
     date = lubridate::ymd(date),
     date_ym = date - years(year(date) - 2022)
     )
 
+for (i in 1:length(levels(teamstats_total$season))) {
+  teamstats_total$date_ym[teamstats_total$season == levels(teamstats_total$season)[i]] <-
+    teamstats_total$date[teamstats_total$season == levels(teamstats_total$season)[i]] %m-% years(i)
+}
+  
+  
 str(teamstats_total)
 ```
+
+# Analyse
+
+## Punkte
+
+### Punkte pro Gegner
+
+```{r order-points-opponent}
+summed_points <- teamstats_total |> 
+     group_by(opp) |> 
+     summarise(Total_Points = sum(pts)) |> 
+     arrange(desc(Total_Points)) |> 
+     pull(opp)
+
+teamstats_total$opp <- factor(teamstats_total$opp, levels = summed_points)
+```
+
+
 
 ```{r plot-points-per-team}
 max_tatal_pts_all_seasons <- teamstats_total |> 
@@ -88,55 +133,153 @@ ggplot(teamstats_total, aes(x = opp, y = pts, fill = season)) +
        x = "Gegner",
        y = "Punkte",
        fill = "Saison") +
-  theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_y_continuous(breaks = seq(0, max_tatal_pts_all_seasons, by = 2), limits = c(0, max_tatal_pts_all_seasons))
+  scale_y_continuous(breaks = seq(0, max_tatal_pts_all_seasons, by = 2), limits = c(0, max_tatal_pts_all_seasons)) +
+  scale_fill_colorblind()
+
 ```
 
-```{r plot-2324}
-plot_time_2223 <- teamstats_total |> 
-  filter(season == levels(teamstats_total$season)[1]) |> 
-  ggplot(aes(x = date, y = spct)) +
-    geom_line(linewidth = 1) +
-  labs(title = "Schussquote über die Saison 2023/2024",
+
+
+```{r plot-points-per-team-asc}
+ggplot(teamstats_total, aes(x = opp, y = pts, fill = season)) +
+  geom_bar(stat = "summary", fun = "sum", position = "dodge", colour = darkgrey, linewidth = 0.25) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(x = "Gegner", 
+       y = "Punkte", 
+       fill = "Saison") +
+  scale_fill_colorblind()
+```
+
+### Punkte über Zeit
+
+```{r plot-punke-saison, fig.asp=0.25}
+ggplot(teamstats_total, aes(x = date_ym, y = pts)) +
+  geom_line(linewidth = 1) +
+  labs(title = "Punkte über die Saison",
        x = "Zeit",
-       y = "Schussquote") +
-  theme_minimal()
+       y = "Punkte") +
+  facet_grid(rows = vars(season)) +
+  theme(strip.text.y = element_text(angle = 0, hjust = 1))
+```
 
-plot_time_2324 <- teamstats_total |> 
-  filter(season == levels(teamstats_total$season)[2]) |> 
-  ggplot(aes(x = date, y = spct)) +
-    geom_line(linewidth = 1) +
-  labs(title = "Schussquote über die Saison 2022/2023",
+
+
+
+
+## Schüsse 
+
+
+
+### Schüsse über Zeit
+
+```{r plot-schuesse-saison}
+ggplot(teamstats_total, aes(x = date_ym, y = sf)) +
+  geom_line(linewidth = 1) +
+  labs(title = "Schüsse über die Saison",
        x = "Zeit",
-       y = "Schussquote") +
-  theme_minimal() 
-  
+       y = "Schüsse") +
+  facet_grid(rows = vars(season)) +
+  theme(strip.text.y = element_text(angle = 0, hjust = 1))
 
-plot_time_2223 + plot_time_2324 + patchwork::plot_layout(ncol = 1)
+```
 
+### Schussverteilung
 
-teamstats_total |> 
-  mutate(date = ifelse(
-    season == levels(teamstats_total$season)[1], 
-    date %m+% years(1), 
-    date)) |> 
-  ggplot(aes(x = date, y = spct)) +
-    geom_line(linewidth = 1) +
+```{r plot-schuesse-hist}
+ggplot(teamstats_total, aes(x = sf)) +
+  geom_histogram(binwidth = 4) +
+  labs(title = "Schüsse",
+       x = "Schüsse",
+       y = "Anzahl") +
+  facet_grid(rows = vars(season)) +
+  theme(strip.text.y = element_text(angle = 0, hjust = 1))
+```
+
+## Tore
+
+### Tore über Zeit
+
+```{r plot-tore-saison}
+ggplot(teamstats_total, aes(x = date_ym, y = gf)) +
+  geom_line(linewidth = 1) +
+  labs(title = "Tore über die Saison",
+       x = "Zeit",
+       y = "Tore") +
+  facet_grid(rows = vars(season)) +
+  theme(strip.text.y = element_text(angle = 0, hjust = 1))
+
+```
+
+### Torverteilung
+
+```{r plot-tore-hist}
+ggplot(teamstats_total, aes(x = gf)) +
+  geom_histogram(binwidth = 1) +
+  labs(title = "Tore",
+       x = "Tore",
+       y = "Anzahl") +
+  facet_grid(rows = vars(season)) +
+  theme(strip.text.y = element_text(angle = 0, hjust = 1))
+```
+
+## Schussquote
+
+### Schussquote über Zeit
+
+```{r plot-schussquote-zeit, fig.asp=0.25}
+ggplot(teamstats_total, aes(x = date_ym, y = spct, color = season)) +
+  geom_line(linewidth = 1) +
   labs(title = "Schussquote über die Saison",
        x = "Zeit",
        y = "Schussquote") +
-  theme_minimal() + 
-  facet_grid(rows = vars(season))
+  scale_color_colorblind()
+```
 
+### Schussquote über Zeit nach Saison
+
+```{r plot-schussquote-saison}
 ggplot(teamstats_total, aes(x = date_ym, y = spct)) +
-    geom_line(linewidth = 1) +
+  geom_line(linewidth = 1) +
   labs(title = "Schussquote über die Saison",
        x = "Zeit",
        y = "Schussquote") +
-  theme_minimal() + 
-  facet_grid(rows = vars(season))
+  facet_grid(rows = vars(season)) +
+  theme(strip.text.y = element_text(angle = 0, hjust = 1))
 ```
+
+### Schussquote + Fangquote (Glück) über Zeit
+
+```{r plot-schussquote-fangquote-saison}
+ggplot(teamstats_total, aes(x = date_ym, y = pdo)) +
+  geom_line(linewidth = 1) +
+  geom_hline(yintercept = 1, color = "red", linetype = "dashed") +
+  labs(title = "PDO: Schussquote + Fangquote",
+       subtitle = "Glück > 1, Pech < 1",
+       x = "Zeit",
+       y = "Schussquote + Fangquote") +
+  facet_grid(rows = vars(season)) +
+  theme(strip.text.y = element_text(angle = 0, hjust = 1))
+```
+
+
+## Tordifferenz
+
+### Tordifferenz über Zeit
+
+```{r plot-tordifferenz-saison}
+ggplot(teamstats_total, aes(x = date_ym, y = gd)) +
+  geom_line(linewidth = 1) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Tordifferenz über die Saison",
+       x = "Zeit",
+       y = "Tordifferenz") +
+  facet_grid(rows = vars(season)) +
+  theme(strip.text.y = element_text(angle = 0, hjust = 1))
+
+```
+
+## Siege/Niederlage
 
 ```{r plot-wintype}
 max_wintype_count <- 
@@ -154,5 +297,41 @@ ggplot(teamstats_total, aes(x = wintype)) +
        y = "Anzahl") +
   facet_grid(rows = vars(season)) +
   scale_y_continuous(breaks = seq(0, max_wintype_count, by = 2)) +
-  theme_minimal()
+  theme(strip.text.y = element_text(angle = 0, hjust = 1))
+```
+
+## Zusammenhänge
+
+
+### Schüsse - Tore
+
+```{r}
+ggplot(teamstats_total, aes(x = sf, y = gf)) +
+  geom_point(alpha=.5) +
+  labs(title = "Schüsse und Tore",
+       x = "Schüsse",
+       y = "Tore") +
+  stat_smooth(method="glm", se=TRUE)
+```
+### Schussdifferenz - Tordifferenz
+
+```{r}
+ggplot(teamstats_total, aes(x = sd, y = gd)) +
+  geom_point(alpha=.5) +
+  labs(title = "Schussdifferenz und Tordifferenz",
+       x = "Schussdifferenz",
+       y = "Tordifferenz") +
+  stat_smooth(method="glm", se=TRUE)
+```
+
+
+### Schussquote - Punkte
+
+```{r}
+ggplot(teamstats_total, aes(x = spct, y = win)) +
+  geom_point(alpha=.5) +
+  labs(title = "Schussquote und Sieg",
+       x = "Schussquote",
+       y = "Sieg") +
+  stat_smooth(method="glm", se=TRUE, method.args = list(family=binomial))
 ```
