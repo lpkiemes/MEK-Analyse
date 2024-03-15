@@ -7,7 +7,7 @@ editor: visual
 
 ```{r setup}
 if (!require("pacman")) install.packages("pacman"); library(pacman)
-pacman::p_load(tidyverse, ggplot2, readr, haven, readxl, here)
+pacman::p_load(tidyverse, ggplot2, readr, haven, readxl, here, dplyr)
 
 here::i_am("analyze.qmd")
 ```
