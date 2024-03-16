@@ -50,6 +50,8 @@ str(teamstats_total)
 # Data Wrangling
 
 ```{r data-wrangling}
+
+
 ### Gegner in Kategorien aufteilen
 
 teamstats_total <- teamstats_total |> 
@@ -71,7 +73,7 @@ teamstats_total <- teamstats_total |>
     oppcat = factor(
       oppcat, 
       levels = c(1:3), 
-      labels = c("high", "mid", "low")
+      labels = c("hoch (Playoffs)", "mittel", "niedrig")
       ),
     opp = case_when(
       opp == "eva" ~ "EV Aich",
@@ -90,14 +92,30 @@ teamstats_total <- teamstats_total |>
     season = paste("Saison 20", season, sep = ""),
     season = as.factor(season),
     date = lubridate::ymd(date),
-    date_ym = date - years(year(date) - 2022)
+    date_ym = date - years(year(date) - 2022),
+    strength = (
+      opptabelle - min(teamstats_total$opptabelle)) / 
+      (max(teamstats_total$opptabelle) - min(teamstats_total$opptabelle)
+       )
     )
 
+# Gegner nach Punkten sortieren
+summed_points <- teamstats_total |> 
+     group_by(opp) |> 
+     summarise(Total_Points = sum(pts)) |> 
+     arrange(desc(Total_Points)) |> 
+     pull(opp)
+
+# Gegner als Faktor mit Sortierung
+teamstats_total <- teamstats_total |> 
+  mutate(opp = factor(opp, levels = summed_points))
+
+# Nach Saison Jahre angleichen für Visualisierung
 for (i in 1:length(levels(teamstats_total$season))) {
   teamstats_total$date_ym[teamstats_total$season == levels(teamstats_total$season)[i]] <-
     teamstats_total$date[teamstats_total$season == levels(teamstats_total$season)[i]] %m-% years(i)
 }
-  
+
   
 str(teamstats_total)
 ```
@@ -107,17 +125,6 @@ str(teamstats_total)
 ## Punkte
 
 ### Punkte pro Gegner
-
-```{r order-points-opponent}
-summed_points <- teamstats_total |> 
-     group_by(opp) |> 
-     summarise(Total_Points = sum(pts)) |> 
-     arrange(desc(Total_Points)) |> 
-     pull(opp)
-
-teamstats_total$opp <- factor(teamstats_total$opp, levels = summed_points)
-```
-
 
 
 ```{r plot-points-per-team}
@@ -303,7 +310,30 @@ ggplot(teamstats_total, aes(x = wintype)) +
 ## Zusammenhänge
 
 
-### Schüsse - Tore
+### Schüsse - Tore nach Stärke Gegner
+
+```{r}
+ggplot(teamstats_total, aes(x = sf, y = gf, color = strength)) +
+  geom_point() +
+  scale_color_gradient(
+    name = "Stärke Gegner", 
+    breaks = c(min(teamstats_total$strength), max(teamstats_total$strength)), 
+    labels = c("hoch", "niedrig"),
+    high = "#F0E442",
+    low = "#D55E00") +
+  labs(title = "Schüsse und Tore",
+       x = "Schüsse",
+       y = "Tore") 
+```
+
+```{r}
+ggplot(teamstats_total, aes(x = sf, y = gf, color = oppcat)) +
+  geom_point() +
+  labs(title = "Schüsse und Tore",
+       x = "Schüsse",
+       y = "Tore",
+       color = "Stärke Gegner")
+```
 
 ```{r}
 ggplot(teamstats_total, aes(x = sf, y = gf)) +
@@ -314,6 +344,22 @@ ggplot(teamstats_total, aes(x = sf, y = gf)) +
   stat_smooth(method="glm", se=TRUE)
 ```
 ### Schussdifferenz - Tordifferenz
+
+```{r}
+ggplot(teamstats_total, aes(x = sd, y = gd, color = opptabelle)) +
+  geom_point() +
+  labs(title = "Schussdifferenz und Tordifferenz",
+       x = "Schussdifferenz",
+       y = "Tordifferenz") 
+```
+
+```{r}
+ggplot(teamstats_total, aes(x = sd, y = gd, color = oppcat)) +
+  geom_point() +
+  labs(title = "Schussdifferenz und Tordifferenz",
+       x = "Schussdifferenz",
+       y = "Tordifferenz") 
+```
 
 ```{r}
 ggplot(teamstats_total, aes(x = sd, y = gd)) +
@@ -328,6 +374,22 @@ ggplot(teamstats_total, aes(x = sd, y = gd)) +
 ### Schussquote - Punkte
 
 ```{r}
+ggplot(teamstats_total, aes(x = spct, y = win, color = opptabelle)) +
+  geom_point(alpha=.5) +
+  labs(title = "Schussquote und Sieg",
+       x = "Schussquote",
+       y = "Sieg") 
+```
+
+```{r}
+ggplot(teamstats_total, aes(x = spct, y = win, color = oppcat)) +
+  geom_point(alpha=.5) +
+  labs(title = "Schussquote und Sieg",
+       x = "Schussquote",
+       y = "Sieg") 
+```
+
+```{r}
 ggplot(teamstats_total, aes(x = spct, y = win)) +
   geom_point(alpha=.5) +
   labs(title = "Schussquote und Sieg",
@@ -335,3 +397,5 @@ ggplot(teamstats_total, aes(x = spct, y = win)) +
        y = "Sieg") +
   stat_smooth(method="glm", se=TRUE, method.args = list(family=binomial))
 ```
+
+
