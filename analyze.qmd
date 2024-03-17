@@ -348,6 +348,8 @@ ggplot(teamstats_total, aes(x = sf, y = gf)) +
 ```{r}
 ggplot(teamstats_total, aes(x = sd, y = gd, color = opptabelle)) +
   geom_point() +
+  geom_hline(yintercept = 0, color = "grey") +
+  geom_vline(xintercept = 0, color = "grey") +
   labs(title = "Schussdifferenz und Tordifferenz",
        x = "Schussdifferenz",
        y = "Tordifferenz") 
@@ -356,6 +358,8 @@ ggplot(teamstats_total, aes(x = sd, y = gd, color = opptabelle)) +
 ```{r}
 ggplot(teamstats_total, aes(x = sd, y = gd, color = oppcat)) +
   geom_point() +
+  geom_hline(yintercept = 0, color = "grey") +
+  geom_vline(xintercept = 0, color = "grey") +
   labs(title = "Schussdifferenz und Tordifferenz",
        x = "Schussdifferenz",
        y = "Tordifferenz") 
@@ -364,6 +368,8 @@ ggplot(teamstats_total, aes(x = sd, y = gd, color = oppcat)) +
 ```{r}
 ggplot(teamstats_total, aes(x = sd, y = gd)) +
   geom_point(alpha=.5) +
+  geom_hline(yintercept = 0, color = "grey") +
+  geom_vline(xintercept = 0, color = "grey") +
   labs(title = "Schussdifferenz und Tordifferenz",
        x = "Schussdifferenz",
        y = "Tordifferenz") +
