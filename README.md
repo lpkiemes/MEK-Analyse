@@ -88,6 +88,10 @@ Hier ist eine detaillierte Erklärung der Daten anhand des Codebuchs:
 - **Definition**: PDO
 - **Ausprägungen**: Schussquote plus Fangquote, Maß des "Glücks" in einem Spiel (PDO > 1 = MEK hatte Glück, PDO < 1 = MEK hatte Pech)
 
+### `pktopp`
+- **Definition**: Punkte Gegner
+- **Ausprägungen**: Die Punktzahl (absolut), die die gegnerische Mannschaft in der Saison 2023/24 erzielt hat
+
 
 
 ## Verwendung
