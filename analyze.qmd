@@ -35,6 +35,11 @@ teamstats_total <- read_xlsx(
   sheet = 1
   )
 
+codebook <- read_xlsx(
+  here::here("2023-bis-2025-Teamstatistiken-R.xlsx"), 
+  sheet = 2
+  )
+
 # Test for two 24/25 games
 # teamstats_total[1, "season"] <- 2425
 # teamstats_total[1, "date"] <- 20241030
