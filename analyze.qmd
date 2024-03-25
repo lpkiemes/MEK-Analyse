@@ -25,9 +25,9 @@ darkgrey <- "#1D1D1B"
 theme_set(theme_minimal())
 ```
 
-# Data
+# Data Teamstats
 
-```{r data}
+```{r data teamstats}
 ### Teamstats importieren
 
 teamstats_total <- read_xlsx(
@@ -35,7 +35,7 @@ teamstats_total <- read_xlsx(
   sheet = 1
   )
 
-codebook <- read_xlsx(
+codebook_teamstats <- read_xlsx(
   here::here("2023-bis-2025-Teamstatistiken-R.xlsx"), 
   sheet = 2
   )
@@ -52,9 +52,9 @@ head(teamstats_total)
 str(teamstats_total)
 ```
 
-# Data Wrangling
+# Data Wrangling Teamstats
 
-```{r data-wrangling}
+```{r data-wrangling teamstats}
 
 
 ### Gegner in Kategorien aufteilen
@@ -99,8 +99,8 @@ teamstats_total <- teamstats_total |>
     date = lubridate::ymd(date),
     date_ym = date - years(year(date) - 2022),
     strength = (
-      opptabelle - min(teamstats_total$opptabelle)) / 
-      (max(teamstats_total$opptabelle) - min(teamstats_total$opptabelle)
+      opptabelle - max(teamstats_total$opptabelle)) / 
+      (min(teamstats_total$opptabelle) - max(teamstats_total$opptabelle)
        )
     )
 
@@ -123,6 +123,41 @@ for (i in 1:length(levels(teamstats_total$season))) {
 
   
 str(teamstats_total)
+```
+
+# Data Playerstats
+
+```{r data playerstats}
+
+playerstats_total <- read_xlsx(
+  here::here("2023-bis-2025-Spielerstatistiken-R.xlsx"),
+  sheet = 1
+)
+
+codebook_playerstats <- read_xlsx(
+  here::here("2023-bis-2025-Spielerstatistiken-R.xlsx"),
+  sheet = 2
+)
+
+
+head(playerstats_total)
+str(playerstats_total)
+```
+
+# Data Wrangling Playerstats
+
+```{r data-wrangling playerstats}
+
+# Saison als Faktor
+playerstats_total <- playerstats_total |> 
+  mutate(
+    mek2223 = as.factor(mek2223),
+    mek2324 = as.factor(mek2324),
+    )
+
+# Name als Faktor mit Sortierung
+teamstats_total <- teamstats_total |> 
+  mutate(opp = factor(opp, levels = summed_points))
 ```
 
 # Analyse
