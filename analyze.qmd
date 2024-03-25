@@ -126,7 +126,6 @@ str(teamstats_total)
 
 ### Punkte pro Gegner
 
-
 ```{r plot-points-per-team}
 max_tatal_pts_all_seasons <- teamstats_total |> 
   group_by(opp) |> 
@@ -146,11 +145,9 @@ ggplot(teamstats_total, aes(x = opp, y = pts, fill = season)) +
 
 ```
 
-
-
 ```{r plot-points-per-team-asc}
 ggplot(teamstats_total, aes(x = opp, y = pts, fill = season)) +
-  geom_bar(stat = "summary", fun = "sum", position = "dodge", colour = darkgrey, linewidth = 0.25) +
+  geom_bar(stat = "summary", fun = "sum", position = "dodge", colour = "darkgrey", linewidth = 0.25) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   labs(x = "Gegner", 
        y = "Punkte", 
@@ -170,13 +167,7 @@ ggplot(teamstats_total, aes(x = date_ym, y = pts)) +
   theme(strip.text.y = element_text(angle = 0, hjust = 1))
 ```
 
-
-
-
-
-## Schüsse 
-
-
+## Schüsse
 
 ### Schüsse über Zeit
 
@@ -269,7 +260,6 @@ ggplot(teamstats_total, aes(x = date_ym, y = pdo)) +
   theme(strip.text.y = element_text(angle = 0, hjust = 1))
 ```
 
-
 ## Tordifferenz
 
 ### Tordifferenz über Zeit
@@ -309,7 +299,6 @@ ggplot(teamstats_total, aes(x = wintype)) +
 
 ## Zusammenhänge
 
-
 ### Schüsse - Tore nach Stärke Gegner
 
 ```{r}
@@ -343,6 +332,7 @@ ggplot(teamstats_total, aes(x = sf, y = gf)) +
        y = "Tore") +
   stat_smooth(method="glm", se=TRUE)
 ```
+
 ### Schussdifferenz - Tordifferenz
 
 ```{r}
@@ -376,7 +366,6 @@ ggplot(teamstats_total, aes(x = sd, y = gd)) +
   stat_smooth(method="glm", se=TRUE)
 ```
 
-
 ### Schussquote - Punkte
 
 ```{r}
@@ -403,5 +392,3 @@ ggplot(teamstats_total, aes(x = spct, y = win)) +
        y = "Sieg") +
   stat_smooth(method="glm", se=TRUE, method.args = list(family=binomial))
 ```
-
-
