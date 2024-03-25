@@ -90,7 +90,7 @@ Hier ist eine detaillierte Erklärung der Daten anhand des Codebuchs:
 
 ### `pktopp`
 - **Definition**: Punkte Gegner
-- **Ausprägungen**: Die Punktzahl (absolut), die die gegnerische Mannschaft in der Saison 2023/24 erzielt hat
+- **Ausprägungen**: Die Punktzahl (absolut), die die gegnerische Mannschaft in der jeweiligen Saison erzielt hat
 
 
 
