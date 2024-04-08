@@ -452,20 +452,18 @@ ggplot(teamstats_total, aes(x = spct, y = win)) +
 
 ggplot(playerstats_total_2324, aes(x = name, y = s2324)) +
   geom_bar(stat = "summary", fun = "sum", position = "dodge", colour = "darkgrey", linewidth = 0.25) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   labs(x = "Spieler", 
-       y = "Schüsse") #+
-  #scale_fill_colorblind()
+       y = "Schüsse") +
+  coord_flip()
 ```
 
 ```{r Schüsse/Spiel pro Spieler 2023/24}
 
 ggplot(playerstats_total_2324, aes(x = name, y = spg2324)) +
   geom_bar(stat = "summary", fun = "sum", position = "dodge", colour = "darkgrey", linewidth = 0.25) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   labs(x = "Spieler", 
-       y = "Schüsse pro Spiel") #+
-  #scale_fill_colorblind()
+       y = "Schüsse pro Spiel") +
+  coord_flip()
 ```
 
 ```{r Schüsse/Tor pro Spieler 2023/24, Referenz: Effizienz 2023/24}
@@ -475,10 +473,9 @@ eff2324team <- sum(playerstats_total_2324$s2324)/sum(playerstats_total_2324$g232
 ggplot(playerstats_total_2324_goalscorers, aes(x = name, y = eff2324)) +
   geom_bar(stat = "summary", fun = "sum", position = "dodge", colour = "darkgrey", linewidth = 0.25) +
     geom_hline(yintercept = eff2324team, color = "red", linetype = "dashed") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   labs(x = "Spieler", 
-       y = "Schüsse pro Tor")#+
-  #scale_fill_colorblind()
+       y = "Schüsse pro Tor") +
+  coord_flip()
 ```
 
 ```{r Schüsse/Tor pro Spieler 2023/24, Referenz: Effizienz 2022/23}
@@ -487,17 +484,14 @@ eff2223team <- 585/69
 ggplot(playerstats_total_2324_goalscorers, aes(x = name, y = eff2324)) +
   geom_bar(stat = "summary", fun = "sum", position = "dodge", colour = "darkgrey", linewidth = 0.25) +
     geom_hline(yintercept = eff2223team, color = "red", linetype = "dashed") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   labs(x = "Spieler", 
-       y = "Schüsse pro Tor")#+
-  #scale_fill_colorblind()
+       y = "Schüsse pro Tor") +
+  coord_flip()
 ```
 
 ```{r Schüsse und Tore}
 ggplot(playerstats_total_2324, aes(x = s2324, y = g2324)) +
   geom_point(alpha=.5) +
-  geom_hline(yintercept = 0, color = "grey") +
-  geom_vline(xintercept = 0, color = "grey") +
   labs(title = "Schüsse und Tore pro Spieler",
        x = "Schüsse Saison 2023/24",
        y = "Tore Saison 2023/24") +
@@ -507,8 +501,6 @@ ggplot(playerstats_total_2324, aes(x = s2324, y = g2324)) +
 ```{r Schüsse/Spiel und Tore}
 ggplot(playerstats_total_2324, aes(x = spg2324, y = g2324)) +
   geom_point(alpha=.5) +
-  geom_hline(yintercept = 0, color = "grey") +
-  geom_vline(xintercept = 0, color = "grey") +
   labs(title = "Schüsse/Spiel und Tore pro Spieler",
        x = "Schüsse/Spiel Saison 2023/24",
        y = "Tore Saison 2023/24") +
@@ -521,20 +513,20 @@ ggplot(playerstats_total_2324, aes(x = spg2324, y = g2324)) +
 ggplot(playerstats_total, aes(x = name)) +
   geom_bar(aes(y = pim2223, fill = "pim2223"), stat = "identity", position = position_dodge(width = 0.9)) +
   geom_bar(aes(y = pim2324, fill = "pim2324"), stat = "identity", position = position_dodge(width = 0.9)) +
-  scale_fill_manual(values = c("pim2223" = "blue", "pim2324" = "red")) +
+  #scale_fill_manual(values = c("pim2223" = "blue", "pim2324" = "red")) +
   labs(x = "Name", y = "Value", fill = "Variables") +
-  theme_minimal()
+  theme_minimal() +
+  coord_flip() +
+  scale_fill_colorblind()
 ```
 
 ```{r HIER: Strafen pro Spieler pro Spiel}
-
 pimpg2324 <- sum(playerstats_total_2324$pim2324)/sum(playerstats_total_2324$gp2324)
 
 ggplot(playerstats_total_2324, aes(x = name, y = pim2324/gp2324)) +
   geom_bar(stat = "summary", fun = "sum", position = "dodge", colour = "darkgrey", linewidth = 0.25) +
     geom_hline(yintercept = pimpg2324, color = "red", linetype = "dashed") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   labs(x = "Spieler", 
-       y = "Strafminuten pro Spiel")#+
-  #scale_fill_colorblind()
+       y = "Strafminuten pro Spiel") +
+  coord_flip()
 ```
