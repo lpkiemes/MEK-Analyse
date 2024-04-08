@@ -12,6 +12,8 @@ toc-depth: 2
 # Setup
 
 ```{r setup}
+rm(list = ls())
+
 if (!require("pacman")) install.packages("pacman"); library(pacman)
 pacman::p_load(
   tidyverse, ggplot2, readr, haven, readxl, here, dplyr, lubridate, patchwork, cli, ggthemes
@@ -25,7 +27,7 @@ darkgrey <- "#1D1D1B"
 theme_set(theme_minimal())
 ```
 
-# Data Teamstats
+# Data Teamstatistiken
 
 ```{r data teamstats}
 ### Teamstats importieren
@@ -52,7 +54,7 @@ head(teamstats_total)
 str(teamstats_total)
 ```
 
-# Data Wrangling Teamstats
+# Data Wrangling Teamstatistiken
 
 ```{r data-wrangling teamstats}
 
@@ -125,7 +127,7 @@ for (i in 1:length(levels(teamstats_total$season))) {
 str(teamstats_total)
 ```
 
-# Data Playerstats
+# Data Spielerstatistiken
 
 ```{r data playerstats}
 
@@ -144,7 +146,7 @@ head(playerstats_total)
 str(playerstats_total)
 ```
 
-# Data Wrangling Playerstats
+# Data Wrangling Spielerstatistiken
 
 ```{r data-wrangling playerstats}
 
@@ -444,12 +446,7 @@ ggplot(teamstats_total, aes(x = spct, y = win)) +
 
 # Analyse Spielerstatistiken
 
-## Unterüberschrift
-
-### Unterunterüberschrift
-
 ```{r Schüsse pro Spieler 2023/24}
-
 ggplot(playerstats_total_2324, aes(x = name, y = s2324)) +
   geom_bar(stat = "summary", fun = "sum", position = "dodge", colour = "darkgrey", linewidth = 0.25) +
   labs(x = "Spieler", 
@@ -507,6 +504,7 @@ ggplot(playerstats_total_2324, aes(x = spg2324, y = g2324)) +
   stat_smooth(method="glm", se=TRUE)
 
 # Schlussfolgerung: Häufiger als ein mal pro Spiel schiessen, sonst bleibt ein Treffer unwahrscheinlich!
+# bruh ._.
 ```
 
 ```{r Strafzeiten nach Saison}
