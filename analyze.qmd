@@ -154,7 +154,8 @@ playerstats_total <- playerstats_total |>
     mek2223 = as.factor(mek2223),
     mek2324 = as.factor(mek2324),
     spg2324 = round(spg2324, 2),
-    eff2324 = round(eff2324, 2)
+    eff2324 = round(eff2324, 2),
+    pos = as.factor(pos)
     )
 
 playerstats_total_2324 <- playerstats_total |>
@@ -184,10 +185,10 @@ max_tatal_pts_all_seasons <- teamstats_total |>
 
 ggplot(teamstats_total, aes(x = opp, y = pts, fill = season)) +
   geom_bar(stat = "identity", position = "stack") +
-  labs(title = "Erzielte Punkte pro Team",
-       x = "Gegner",
+  labs(x = "Gegner",
        y = "Punkte",
-       fill = "Saison") +
+       fill = "Saison",
+       title = "Erzielte Punkte pro Team") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   scale_y_continuous(breaks = seq(0, max_tatal_pts_all_seasons, by = 2), limits = c(0, max_tatal_pts_all_seasons)) +
   scale_fill_colorblind()
@@ -200,8 +201,37 @@ ggplot(teamstats_total, aes(x = opp, y = pts, fill = season)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   labs(x = "Gegner", 
        y = "Punkte", 
-       fill = "Saison") +
-  scale_fill_colorblind()
+       fill = "Saison",
+       title = "Erzielte Punkte pro Team",
+       subtitle = "Vergleich Saison 2023/24 mit Saison 2022/23") #+
+#  scale_fill_colorblind()
+```
+
+### Punkte Auswärts vs Heim
+
+```{r plot-points-per-team-asc}
+ggplot(teamstats_total, aes(x = heim, y = pts, fill = season)) +
+  geom_bar(stat = "summary", fun = "sum", position = "dodge", colour = "darkgrey", linewidth = 0.25) +
+  theme(axis.text.x = element_text(angle = 0, hjust = 1)) +
+  labs(x = "Auswärts/Heim", 
+       y = "Punkte", 
+       fill = "Saison",
+       title = "Erzielte Punkte Auswärts vs Heim",
+       subtitle = "Vergleich Saison 2023/24 mit Saison 2022/23") +
+  scale_x_discrete(labels = c("Auswärts", "Heim")) #+
+#  scale_fill_colorblind()
+```
+
+```{}
+```
+
+```{}
+```
+
+```{}
+```
+
+```{}
 ```
 
 ### Punkte über Zeit
@@ -209,23 +239,51 @@ ggplot(teamstats_total, aes(x = opp, y = pts, fill = season)) +
 ```{r plot-punke-saison, fig.asp=0.25}
 ggplot(teamstats_total, aes(x = date_ym, y = pts)) +
   geom_line(linewidth = 1) +
-  labs(title = "Punkte über die Saison",
-       x = "Zeit",
-       y = "Punkte") +
+  labs(x = "Zeit",
+       y = "Punkte",
+       title = "Punkte über die Saison") +
   facet_grid(rows = vars(season)) +
   theme(strip.text.y = element_text(angle = 0, hjust = 1))
 ```
 
 ## Schüsse
 
+### Schüsse pro Gegner
+
+```{r plot-shotsfor-per-team-asc}
+ggplot(teamstats_total, aes(x = opp, y = sf, fill = season)) +
+  geom_bar(stat = "summary", fun = "sum", position = "dodge", colour = "darkgrey", linewidth = 0.25) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(x = "Gegner", 
+       y = "Torschüsse", 
+       fill = "Saison",
+       title = "Torschüsse pro Gegner",
+       subtitle = "Vergleich Saison 2023/24 mit Saison 2022/23") #+
+#  scale_fill_colorblind()
+```
+
+### Torschüsse gegnerische Mannschaft pro Gegner
+
+```{r plot-shotsagainst-per-team-asc}
+ggplot(teamstats_total, aes(x = opp, y = sa, fill = season)) +
+  geom_bar(stat = "summary", fun = "sum", position = "dodge", colour = "darkgrey", linewidth = 0.25) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(x = "Gegner", 
+       y = "Torschüsse Gegner", 
+       fill = "Saison",
+       title = "Torschüsse gegnerische Mannschaft pro Gegner",
+       subtitle = "Vergleich Saison 2023/24 mit Saison 2022/23") #+
+#  scale_fill_colorblind()
+```
+
 ### Schüsse über Zeit
 
 ```{r plot-schuesse-saison}
 ggplot(teamstats_total, aes(x = date_ym, y = sf)) +
   geom_line(linewidth = 1) +
-  labs(title = "Schüsse über die Saison",
-       x = "Zeit",
-       y = "Schüsse") +
+  labs(x = "Zeit",
+       y = "Schüsse",
+       title = "Schüsse über die Saison") +
   facet_grid(rows = vars(season)) +
   theme(strip.text.y = element_text(angle = 0, hjust = 1))
 
@@ -236,23 +294,53 @@ ggplot(teamstats_total, aes(x = date_ym, y = sf)) +
 ```{r plot-schuesse-hist}
 ggplot(teamstats_total, aes(x = sf)) +
   geom_histogram(binwidth = 4) +
-  labs(title = "Schüsse",
-       x = "Schüsse",
-       y = "Anzahl") +
+  labs(x = "Anzahl Torschüsse",
+       y = "Häufigkeit",
+       title = "Histogramm Torschüsse",
+       subtitle = "Vergleich Saison 2023/24 mit Saison 2022/23") +
   facet_grid(rows = vars(season)) +
   theme(strip.text.y = element_text(angle = 0, hjust = 1))
 ```
 
 ## Tore
 
+### Tore pro Gegner
+
+```{r plot-goals-per-team-asc}
+ggplot(teamstats_total, aes(x = opp, y = gf, fill = season)) +
+  geom_bar(stat = "summary", fun = "sum", position = "dodge", colour = "darkgrey", linewidth = 0.25) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(x = "Gegner", 
+       y = "Tore", 
+       fill = "Saison",
+       title = "Tore pro Gegner",
+       subtitle = "Vergleich Saison 2023/24 mit Saison 2022/23") #+
+#  scale_fill_colorblind()
+```
+
+### Gegentore pro Gegner
+
+```{r plot-goalsagainst-per-team-asc}
+ggplot(teamstats_total, aes(x = opp, y = ga, fill = season)) +
+  geom_bar(stat = "summary", fun = "sum", position = "dodge", colour = "darkgrey", linewidth = 0.25) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(x = "Gegner", 
+       y = "Gegentore", 
+       fill = "Saison",
+       title = "Gegentore pro Gegner",
+       subtitle = "Vergleich Saison 2023/24 mit Saison 2022/23") #+
+#  scale_fill_colorblind()
+
+```
+
 ### Tore über Zeit
 
 ```{r plot-tore-saison}
 ggplot(teamstats_total, aes(x = date_ym, y = gf)) +
   geom_line(linewidth = 1) +
-  labs(title = "Tore über die Saison",
-       x = "Zeit",
-       y = "Tore") +
+  labs(x = "Zeit",
+       y = "Tore",
+       title = "Tore über die Saison") +
   facet_grid(rows = vars(season)) +
   theme(strip.text.y = element_text(angle = 0, hjust = 1))
 
@@ -263,11 +351,103 @@ ggplot(teamstats_total, aes(x = date_ym, y = gf)) +
 ```{r plot-tore-hist}
 ggplot(teamstats_total, aes(x = gf)) +
   geom_histogram(binwidth = 1) +
-  labs(title = "Tore",
-       x = "Tore",
-       y = "Anzahl") +
+  labs(x = "Tore",
+       y = "Anzahl",
+       title = "Tore") +
   facet_grid(rows = vars(season)) +
   theme(strip.text.y = element_text(angle = 0, hjust = 1))
+```
+
+## Auswärts vs Heim
+
+### Tore Auswärts vs Heim
+
+```{r plot-goals-home-vs-goals-away}
+ggplot(teamstats_total, aes(x = heim, y = gf, fill = season)) +
+  geom_bar(stat = "summary", fun = "sum", position = "dodge", colour = "darkgrey", linewidth = 0.25) +
+  theme(axis.text.x = element_text(angle = 0, hjust = 1)) +
+  labs(x = "Auswärts/Heim", 
+       y = "Tore", 
+       fill = "Saison",
+       title = "Erzielte Tore Auswärts vs Heim",
+       subtitle = "Vergleich Saison 2023/24 mit Saison 2022/23") +
+  scale_x_discrete(labels = c("Auswärts", "Heim"))#+
+  #scale_fill_colorblind()
+```
+
+### Gegentore Auswärts vs Heim
+
+```{r plot-goalsagainst-home-vs-goalsagainst-away}
+ggplot(teamstats_total, aes(x = heim, y = ga, fill = season)) +
+  geom_bar(stat = "summary", fun = "sum", position = "dodge", colour = "darkgrey", linewidth = 0.25) +
+  theme(axis.text.x = element_text(angle = 0, hjust = 1)) +
+  labs(x = "Auswärts/Heim", 
+       y = "Gegentore", 
+       fill = "Saison",
+       title = "Kassierte Gegentore Auswärts vs Heim",
+       subtitle = "Vergleich Saison 2023/24 mit Saison 2022/23") +
+  scale_x_discrete(labels = c("Auswärts", "Heim"))#+
+  #scale_fill_colorblind()
+```
+
+### Überzahlsituationen Auswärts vs Heim
+
+```{r plot-pp-home-vs-pp-away}
+ggplot(teamstats_total, aes(x = heim, y = pp, fill = season)) +
+  geom_bar(stat = "summary", fun = "sum", position = "dodge", colour = "darkgrey", linewidth = 0.25) +
+  theme(axis.text.x = element_text(angle = 0, hjust = 1)) +
+  labs(x = "Auswärts/Heim", 
+       y = "Überzahlsituationen", 
+       fill = "Saison",
+       title = "Überzahlsituationen Auswärts vs Heim",
+       subtitle = "Vergleich Saison 2023/24 mit Saison 2022/23") +
+  scale_x_discrete(labels = c("Auswärts", "Heim"))#+
+  #scale_fill_colorblind()
+```
+
+### Überzahltore Auswärts vs Heim
+
+```{r plot-ppg-home-vs-ppg-away}
+ggplot(teamstats_total, aes(x = heim, y = ppg, fill = season)) +
+  geom_bar(stat = "summary", fun = "sum", position = "dodge", colour = "darkgrey", linewidth = 0.25) +
+  theme(axis.text.x = element_text(angle = 0, hjust = 1)) +
+  labs(x = "Auswärts/Heim", 
+       y = "Powerplays", 
+       fill = "Saison",
+       title = "Überzahltore Auswärts vs Heim",
+       subtitle = "Vergleich Saison 2023/24 mit Saison 2022/23") +
+  scale_x_discrete(labels = c("Auswärts", "Heim"))#+
+  #scale_fill_colorblind()
+```
+
+### Unterzahlsituationen Auswärts vs Heim
+
+```{r plot-pk-home-vs-pk-away}
+ggplot(teamstats_total, aes(x = heim, y = pk, fill = season)) +
+  geom_bar(stat = "summary", fun = "sum", position = "dodge", colour = "darkgrey", linewidth = 0.25) +
+  theme(axis.text.x = element_text(angle = 0, hjust = 1)) +
+  labs(x = "Auswärts/Heim", 
+       y = "Unterzahlsituationen", 
+       fill = "Saison",
+       title = "Unterzahlsituationen Auswärts vs Heim",
+       subtitle = "Vergleich Saison 2023/24 mit Saison 2022/23") +
+  scale_x_discrete(labels = c("Auswärts", "Heim"))#+
+  #scale_fill_colorblind()
+```
+
+### Unterzahlgegentore Auswärts vs Heim
+
+```{r plot-pkga-home-vs-pkga-away}
+ggplot(teamstats_total, aes(x = heim, y = pkga, fill = season)) +
+  geom_bar(stat = "summary", fun = "sum", position = "dodge", colour = "darkgrey", linewidth = 0.25) +
+  theme(axis.text.x = element_text(angle = 0, hjust = 1)) +
+  labs(x = "Auswärts/Heim", 
+       y = "Unterzahlgegentore", 
+       fill = "Saison",
+       title = "Unterzahlgegentore Auswärts vs Heim",
+       subtitle = "Vergleich Saison 2023/24 mit Saison 2022/23") +
+  scale_x_discrete(labels = c("Auswärts", "Heim"))#+
+  #scale_fill_colorblind()
 ```
 
 ## Schussquote
@@ -277,9 +457,9 @@ ggplot(teamstats_total, aes(x = gf)) +
 ```{r plot-schussquote-zeit, fig.asp=0.25}
 ggplot(teamstats_total, aes(x = date_ym, y = spct, color = season)) +
   geom_line(linewidth = 1) +
-  labs(title = "Schussquote über die Saison",
-       x = "Zeit",
-       y = "Schussquote") +
+  labs(x = "Zeit",
+       y = "Schussquote",
+       title = "Schussquote über die Saison") +
   scale_color_colorblind()
 ```
 
@@ -288,9 +468,9 @@ ggplot(teamstats_total, aes(x = date_ym, y = spct, color = season)) +
 ```{r plot-schussquote-saison}
 ggplot(teamstats_total, aes(x = date_ym, y = spct)) +
   geom_line(linewidth = 1) +
-  labs(title = "Schussquote über die Saison",
-       x = "Zeit",
-       y = "Schussquote") +
+  labs(x = "Zeit",
+       y = "Schussquote",
+       title = "Schussquote über die Saison") +
   facet_grid(rows = vars(season)) +
   theme(strip.text.y = element_text(angle = 0, hjust = 1))
 ```
@@ -301,10 +481,10 @@ ggplot(teamstats_total, aes(x = date_ym, y = spct)) +
 ggplot(teamstats_total, aes(x = date_ym, y = pdo)) +
   geom_line(linewidth = 1) +
   geom_hline(yintercept = 1, color = "red", linetype = "dashed") +
-  labs(title = "PDO: Schussquote + Fangquote",
-       subtitle = "Glück > 1, Pech < 1",
-       x = "Zeit",
-       y = "Schussquote + Fangquote") +
+  labs(x = "Zeit",
+       y = "Schussquote + Fangquote",
+       title = "PDO: Schussquote + Fangquote",
+       subtitle = "Glück > 1, Pech < 1") +
   facet_grid(rows = vars(season)) +
   theme(strip.text.y = element_text(angle = 0, hjust = 1))
 ```
@@ -317,9 +497,9 @@ ggplot(teamstats_total, aes(x = date_ym, y = pdo)) +
 ggplot(teamstats_total, aes(x = date_ym, y = gd)) +
   geom_line(linewidth = 1) +
   geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
-  labs(title = "Tordifferenz über die Saison",
-       x = "Zeit",
-       y = "Tordifferenz") +
+  labs(x = "Zeit",
+       y = "Tordifferenz",
+       title = "Tordifferenz über die Saison") +
   facet_grid(rows = vars(season)) +
   theme(strip.text.y = element_text(angle = 0, hjust = 1))
 
@@ -338,9 +518,9 @@ max_wintype_count <-
 
 ggplot(teamstats_total, aes(x = wintype)) +
   geom_bar() +
-  labs(title = "Siege und Niederlagen nach Saison",
-       x = "Typ",
-       y = "Anzahl") +
+  labs(x = "Typ",
+       y = "Anzahl",
+       title = "Siege und Niederlagen nach Saison") +
   facet_grid(rows = vars(season)) +
   scale_y_continuous(breaks = seq(0, max_wintype_count, by = 2)) +
   theme(strip.text.y = element_text(angle = 0, hjust = 1))
@@ -359,26 +539,26 @@ ggplot(teamstats_total, aes(x = sf, y = gf, color = strength)) +
     labels = c("hoch", "niedrig"),
     high = "#F0E442",
     low = "#D55E00") +
-  labs(title = "Schüsse und Tore",
-       x = "Schüsse",
-       y = "Tore") 
+  labs(x = "Schüsse",
+       y = "Tore",
+       title = "Schüsse und Tore") 
 ```
 
 ```{r}
 ggplot(teamstats_total, aes(x = sf, y = gf, color = oppcat)) +
   geom_point() +
-  labs(title = "Schüsse und Tore",
-       x = "Schüsse",
+  labs(x = "Schüsse",
        y = "Tore",
-       color = "Stärke Gegner")
+       color = "Stärke Gegner",
+       title = "Schüsse und Tore")
 ```
 
 ```{r}
 ggplot(teamstats_total, aes(x = sf, y = gf)) +
   geom_point(alpha=.5) +
-  labs(title = "Schüsse und Tore",
-       x = "Schüsse",
-       y = "Tore") +
+  labs(x = "Schüsse",
+       y = "Tore",
+       title = "Schüsse und Tore") +
   stat_smooth(method="glm", se=TRUE)
 ```
 
@@ -389,9 +569,9 @@ ggplot(teamstats_total, aes(x = sd, y = gd, color = opptabelle)) +
   geom_point() +
   geom_hline(yintercept = 0, color = "grey") +
   geom_vline(xintercept = 0, color = "grey") +
-  labs(title = "Schussdifferenz und Tordifferenz",
-       x = "Schussdifferenz",
-       y = "Tordifferenz") 
+  labs(x = "Schussdifferenz",
+       y = "Tordifferenz",
+       title = "Schussdifferenz und Tordifferenz") 
 ```
 
 ```{r}
@@ -399,9 +579,9 @@ ggplot(teamstats_total, aes(x = sd, y = gd, color = oppcat)) +
   geom_point() +
   geom_hline(yintercept = 0, color = "grey") +
   geom_vline(xintercept = 0, color = "grey") +
-  labs(title = "Schussdifferenz und Tordifferenz",
-       x = "Schussdifferenz",
-       y = "Tordifferenz") 
+  labs(x = "Schussdifferenz",
+       y = "Tordifferenz",
+       title = "Schussdifferenz und Tordifferenz") 
 ```
 
 ```{r}
@@ -409,9 +589,9 @@ ggplot(teamstats_total, aes(x = sd, y = gd)) +
   geom_point(alpha=.5) +
   geom_hline(yintercept = 0, color = "grey") +
   geom_vline(xintercept = 0, color = "grey") +
-  labs(title = "Schussdifferenz und Tordifferenz",
-       x = "Schussdifferenz",
-       y = "Tordifferenz") +
+  labs(x = "Schussdifferenz",
+       y = "Tordifferenz",
+       title = "Schussdifferenz und Tordifferenz") +
   stat_smooth(method="glm", se=TRUE)
 ```
 
@@ -420,51 +600,62 @@ ggplot(teamstats_total, aes(x = sd, y = gd)) +
 ```{r}
 ggplot(teamstats_total, aes(x = spct, y = win, color = opptabelle)) +
   geom_point(alpha=.5) +
-  labs(title = "Schussquote und Sieg",
-       x = "Schussquote",
-       y = "Sieg") 
+  labs(x = "Schussquote",
+       y = "Sieg",
+       title = "Schussquote und Sieg") 
 ```
 
 ```{r}
 ggplot(teamstats_total, aes(x = spct, y = win, color = oppcat)) +
   geom_point(alpha=.5) +
-  labs(title = "Schussquote und Sieg",
-       x = "Schussquote",
-       y = "Sieg") 
+  labs(x = "Schussquote",
+       y = "Sieg",
+       title = "Schussquote und Sieg") 
 ```
 
 ```{r}
 ggplot(teamstats_total, aes(x = spct, y = win)) +
   geom_point(alpha=.5) +
-  labs(title = "Schussquote und Sieg",
-       x = "Schussquote",
-       y = "Sieg") +
+  labs(x = "Schussquote",
+       y = "Sieg",
+       title = "Schussquote und Sieg") +
   stat_smooth(method="glm", se=TRUE, method.args = list(family=binomial))
 ```
 
 # Analyse Spielerstatistiken
 
-## Unterüberschrift
+## Schüsse
 
-### Unterunterüberschrift
+### Schüsse pro Spieler 2023/24 - Gesamt
 
 ```{r Schüsse pro Spieler 2023/24}
 
 ggplot(playerstats_total_2324, aes(x = name, y = s2324)) +
   geom_bar(stat = "summary", fun = "sum", position = "dodge", colour = "darkgrey", linewidth = 0.25) +
   labs(x = "Spieler", 
-       y = "Schüsse") +
+       y = "Schüsse",
+       title = "Schüsse in der Saison 2023/24",
+       subtitle = "Schüsse pro Spieler gesamt") +
   coord_flip()
 ```
+
+### Schüsse pro Spieler 2023/24 - Schnitt
 
 ```{r Schüsse/Spiel pro Spieler 2023/24}
 
+spg2324team <- sum(playerstats_total_2324$s2324)/sum(playerstats_total_2324$gp2324)
+
 ggplot(playerstats_total_2324, aes(x = name, y = spg2324)) +
   geom_bar(stat = "summary", fun = "sum", position = "dodge", colour = "darkgrey", linewidth = 0.25) +
+    geom_hline(yintercept = spg2324team, color = "red", linetype = "dashed") +
   labs(x = "Spieler", 
-       y = "Schüsse pro Spiel") +
+       y = "Schüsse pro Spiel",
+       title = "Schüsse in der Saison 2023/24 pro Spieler pro Spiel",
+       subtitle = "Gestrichelte Linie: Durchschnitt Schüsse pro Spieler pro Spiel 2023/24") +
   coord_flip()
 ```
+
+### Effizienz pro Spieler 2023/24 - Vergleich Schnitt 2023/24
 
 ```{r Schüsse/Tor pro Spieler 2023/24, Referenz: Effizienz 2023/24}
 
@@ -474,9 +665,13 @@ ggplot(playerstats_total_2324_goalscorers, aes(x = name, y = eff2324)) +
   geom_bar(stat = "summary", fun = "sum", position = "dodge", colour = "darkgrey", linewidth = 0.25) +
     geom_hline(yintercept = eff2324team, color = "red", linetype = "dashed") +
   labs(x = "Spieler", 
-       y = "Schüsse pro Tor") +
+       y = "Schüsse pro Tor",
+       title = "Effizienz in der Saison 2023/24",
+       subtitle = "Gestrichelte Linie: Durchschnittliche Effizient in der Saison 2023/24") +
   coord_flip()
 ```
+
+### Effizienz pro Spieler 2023/24 - Vergleich Schnitt 2022/23
 
 ```{r Schüsse/Tor pro Spieler 2023/24, Referenz: Effizienz 2022/23}
 eff2223team <- 585/69
@@ -485,9 +680,13 @@ ggplot(playerstats_total_2324_goalscorers, aes(x = name, y = eff2324)) +
   geom_bar(stat = "summary", fun = "sum", position = "dodge", colour = "darkgrey", linewidth = 0.25) +
     geom_hline(yintercept = eff2223team, color = "red", linetype = "dashed") +
   labs(x = "Spieler", 
-       y = "Schüsse pro Tor") +
+       y = "Schüsse pro Tor",
+       title = "Effizienz in der Saison 2023/24",
+       subtitle = "Gestrichelte Linie: Durchschnittliche Effizient in der Saison 2022/23") +
   coord_flip()
 ```
+
+### Zusammenhang - Schüsse und Tore pro Spieler
 
 ```{r Schüsse und Tore}
 ggplot(playerstats_total_2324, aes(x = s2324, y = g2324)) +
@@ -498,12 +697,15 @@ ggplot(playerstats_total_2324, aes(x = s2324, y = g2324)) +
   stat_smooth(method="glm", se=TRUE)
 ```
 
+### Zusammenhang - Schüsse pro Spiel und Tore pro Spieler
+
 ```{r Schüsse/Spiel und Tore}
 ggplot(playerstats_total_2324, aes(x = spg2324, y = g2324)) +
   geom_point(alpha=.5) +
-  labs(title = "Schüsse/Spiel und Tore pro Spieler",
-       x = "Schüsse/Spiel Saison 2023/24",
-       y = "Tore Saison 2023/24") +
+  labs(x = "Schüsse/Spiel Saison 2023/24",
+       y = "Tore Saison 2023/24",
+       title = "Schüsse pro Spiel und Tore pro Spieler",
+       subtitle = "Scatterplot zum Zusammenhang zwischen Torschüssen pro Spiel und erzielten Toren") +
   stat_smooth(method="glm", se=TRUE)
 
 # Schlussfolgerung: Häufiger als ein mal pro Spiel schiessen, sonst bleibt ein Treffer unwahrscheinlich!
@@ -520,6 +722,10 @@ ggplot(playerstats_total, aes(x = name)) +
   scale_fill_colorblind()
 ```
 
+## Strafen
+
+### Strafminuten pro Spieler - Schnitt, Referenz Durchschnitt 2023/24
+
 ```{r HIER: Strafen pro Spieler pro Spiel}
 pimpg2324 <- sum(playerstats_total_2324$pim2324)/sum(playerstats_total_2324$gp2324)
 
@@ -527,6 +733,22 @@ ggplot(playerstats_total_2324, aes(x = name, y = pim2324/gp2324)) +
   geom_bar(stat = "summary", fun = "sum", position = "dodge", colour = "darkgrey", linewidth = 0.25) +
     geom_hline(yintercept = pimpg2324, color = "red", linetype = "dashed") +
   labs(x = "Spieler", 
-       y = "Strafminuten pro Spiel") +
+       y = "Strafminuten pro Spiel",
+       title = "Strafminuten pro Spieler pro Spiel in der Saison 2023/24",
+       subtitle = "Gestrichelte Linie: Durchschnittliche Strafminuten pro Spiel 2023/24") +
   coord_flip()
+```
+
+### Strafminuten pro Position - Schnitt, Referenz Durchschnitt 2023/24
+
+```{r HIER: Strafen pro Position pro Spiel}
+pimpg2324 <- sum(playerstats_total_2324$pim2324)/sum(playerstats_total_2324$gp2324)
+
+ggplot(playerstats_total_2324, aes(x = pos, y = pim2324/gp2324)) +
+  geom_bar(stat = "summary", fun = "sum", position = "dodge", colour = "darkgrey", linewidth = 0.25) +
+    geom_hline(yintercept = pimpg2324, color = "red", linetype = "dashed") +
+  labs(x = "Spieler", 
+       y = "Strafminuten pro Spiel",
+       title = "Strafminuten pro Spieler pro Spiel in der Saison 2023/24",
+       subtitle = "Gestrichelte Linie: Durchschnittliche Strafminuten pro Spiel 2023/24")
 ```
