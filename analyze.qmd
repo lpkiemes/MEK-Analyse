@@ -222,17 +222,6 @@ ggplot(teamstats_total, aes(x = heim, y = pts, fill = season)) +
 #  scale_fill_colorblind()
 ```
 
-```{}
-```
-
-```{}
-```
-
-```{}
-```
-
-```{}
-```
 
 ### Punkte über Zeit
 
@@ -298,6 +287,7 @@ ggplot(teamstats_total, aes(x = sf)) +
        y = "Häufigkeit",
        title = "Histogramm Torschüsse",
        subtitle = "Vergleich Saison 2023/24 mit Saison 2022/23") +
+
   facet_grid(rows = vars(season)) +
   theme(strip.text.y = element_text(angle = 0, hjust = 1))
 ```
